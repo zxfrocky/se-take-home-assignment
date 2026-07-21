@@ -7,11 +7,14 @@ import (
 	"time"
 )
 
+// EventLogger 是并发安全的 io.Writer 包装，所有写操作互斥。
+// 多个 bot goroutine 和 dispatchLoop 会同时写日志，必须串行化。
 type EventLogger struct {
 	mu sync.Mutex
 	w  io.Writer
 }
 
+// NewEventLogger 创建一个写到 w 的 logger。
 func NewEventLogger(w io.Writer) *EventLogger {
 	return &EventLogger{w: w}
 }

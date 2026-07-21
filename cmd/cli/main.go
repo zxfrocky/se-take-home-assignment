@@ -1,3 +1,6 @@
+// Package main 实现 order-cli：一个向 order-server 发请求的轻量命令行工具。
+// 用法：order-cli '{"action":"add","object":"orders","type":"vip"}'
+// 支持的 action：add/remove/finalize/status。
 package main
 
 import (
@@ -11,6 +14,8 @@ import (
 	"time"
 )
 
+// command 是 CLI 输入的解析结果。JSON tag 对应输入 JSON 字段。
+// 也支持简化的非 JSON 语法（见 parseCommand）。
 type command struct {
 	Action string `json:"action"`
 	Object string `json:"object"`
@@ -132,6 +137,8 @@ func normalizeBaseURL(addr string) string {
 	return strings.TrimRight(addr, "/")
 }
 
+// parseCommand 接受两种输入：标准 JSON 或简化的花括号语法（如 {action:add,object:orders}）。
+// 后者是为了让 shell 里输入更省事——不用引号转义。先试 JSON，失败再降级解析。
 func parseCommand(input string) (command, error) {
 	var cmd command
 	if err := json.Unmarshal([]byte(input), &cmd); err == nil {

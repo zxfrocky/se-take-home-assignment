@@ -6,10 +6,19 @@ import (
 	"strings"
 )
 
+// HTTPServer 把 Controller 暴露为 RESTful HTTP 接口。
+// 所有 handler 都是薄包装：解析参数、调 controller、JSON 返回。
 type HTTPServer struct {
 	controller *Controller
 }
 
+// NewHTTPServer 创建一个 http.Handler，路由：
+//   GET    /healthz   健康检查
+//   POST   /orders    创建订单（?type=vip|normal，默认 normal）
+//   POST   /bots      添加 bot
+//   DELETE /bots      删除最新 bot
+//   GET    /status    返回 Snapshot
+//   POST   /finalize  写 Final Status 并返回 Snapshot
 func NewHTTPServer(controller *Controller) http.Handler {
 	s := &HTTPServer{controller: controller}
 	mux := http.NewServeMux()
